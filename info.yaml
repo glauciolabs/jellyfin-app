@@ -1,0 +1,5 @@
+app:
+  name: jellyfin
+  version: v10.11.8
+  project: jellyfin-app
+  namespace: jellyfin-app

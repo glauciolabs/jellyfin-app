@@ -1,0 +1,63 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-jellyfin
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: glaucio.campos@hotmail.com
+    privateKeySecretRef:
+      name: letsencrypt-jellyfin
+    solvers:
+    - selector: {}
+      http01:
+        ingress:
+          class: traefik
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ssl-cert-jellyfin
+spec:
+  secretName: ssl-cert-jellyfin
+  issuerRef:
+    name: letsencrypt-jellyfin
+    kind: ClusterIssuer
+  commonName: jellyfin-dev-ja5ad3qach.duckdns.org
+  dnsNames:
+  - jellyfin-dev-ja5ad3qach.duckdns.org
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin-prod
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/redirect-entry-point: "https"
+    traefik.ingress.kubernetes.io/redirect-permanent: "true"
+    traefik.ingress.kubernetes.io/forwarded-headers: "true"
+    traefik.ingress.kubernetes.io/forwarded-headers-ssl-proxy: "true"
+    traefik.ingress.kubernetes.io/forwarded-headers-insecure: "true"
+    traefik.ingress.kubernetes.io/request-header-forwarding: "true"
+    traefik.ingress.kubernetes.io/proxy-body-size: "200m"
+    traefik.ingress.kubernetes.io/proxy-connect-timeout: "130s"
+    traefik.ingress.kubernetes.io/client-max-body-size: "200m"
+    traefik.ingress.kubernetes.io/use-forwarded-headers: "true"
+    traefik.ingress.kubernetes.io/tls: "true"
+
+spec:
+  rules:
+    - host: jellyfin-dev-ja5ad3qach.duckdns.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin
+                port:
+                  number: 8096
+  tls:
+  - hosts:
+    - jellyfin-dev-ja5ad3qach.duckdns.org
+    secretName: ssl-cert-jellyfin

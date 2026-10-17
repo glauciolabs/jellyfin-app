@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      containers:
+        - name: jellyfin
+          image: lscr.io/linuxserver/jellyfin:latest
+          resources:
+            limits:
+              cpu: "0.6"
+              memory: "3052Mi"
+            requests:
+              cpu: "0.3"
+              memory: "1024Mi"
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /cursos
+              name: cursos
+          ports:
+            - containerPort: 8096
+              name: http
+              protocol: TCP
+          env:
+            - name: TZ
+              value: "America/Sao_Paulo"
+            - name: PUID
+              value: "3000"
+            - name: PGID
+              value: "3000"
+            - name: JELLYFIN_PublishedServerUrl
+              value: "https://jellyfin.prod-fl4oxep5xi2ebicosic8oylthu6og3xechu.duckdns.org"
+      volumes:
+      - name: config
+        hostPath:
+          path: /k3s-data/jellyfin
+      - name: cursos
+        hostpath:
+          path: /k3s-data/jellyfin/cursos

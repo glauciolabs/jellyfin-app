@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jellyfin
+  namespace: jellyfin-app
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-cloudflare
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+    external-dns.alpha.kubernetes.io/target: "5bf6bf0d-fe5a-40fc-adf1-887f866992e3.cfargotunnel.com"
+    external-dns.kubernetes.io/cloudflare-proxied: "true"
+    external-dns.kubernetes.io/target: "5bf6bf0d-fe5a-40fc-adf1-887f866992e3.cfargotunnel.com"
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - media.glauciolabs.work
+      secretName: jellyfin-tls
+  rules:
+    - host: media.glauciolabs.work
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin
+                port:
+                  number: 8096

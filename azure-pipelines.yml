@@ -1,0 +1,23 @@
+trigger:
+- production
+- develop
+
+variables:
+  - name: archetype
+    value: k8s-apps
+  - group: pipeline_secrets
+
+resources:
+  repositories:
+    - repository: core-pipelines
+      ref: refs/tags/v1.0.0
+      type: git
+      name: SpartanOps/core-pipelines
+
+stages:
+  - template: /azure-pipelines/main.yml@core-pipelines
+    parameters:
+      archetype: ${{ variables.archetype }}
+      kustomization_overlay: false
+      helm_chart: false
+      gitops_app: "argocd"

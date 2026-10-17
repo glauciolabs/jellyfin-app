@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  namespace: jellyfin-app
+  labels:
+    app: jellyfin
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - h89-1
+                      - h89-2
+      containers:
+        - name: jellyfin
+          image: linuxserver/jellyfin:10.11.11
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: America/Sao_Paulo
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: JELLYFIN_PublishedServerUrl
+              value: https://media.glauciolabs.work
+          ports:
+            - containerPort: 8096
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 800m
+              memory: 1Gi
+            requests:
+              cpu: 150m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /media
+              name: media-public
+              mountPropagation: HostToContainer
+              readOnly: true
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+          - 1.0.0.1
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: config
+          hostPath:
+            path: /data/jellyfin-app/config
+            type: DirectoryOrCreate
+        - name: media-public
+          hostPath:
+            path: /onedrive-glaucio-media-root
+            type: DirectoryOrCreate
