@@ -30,7 +30,7 @@ spec:
                       - h89-2
       containers:
         - name: jellyfin
-          image: linuxserver/jellyfin:10.11.11
+          image: linuxserver/jellyfin:arm64v8-version-12.4ubu2604
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
