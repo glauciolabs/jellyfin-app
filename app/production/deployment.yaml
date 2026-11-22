@@ -64,30 +64,10 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              echo "user_allow_other" > /etc/fuse.conf
-              exec rclone mount "gdrive:media" /media \
-                --config=/config/rclone/rclone.conf \
-                --allow-other \
-                --allow-non-empty \
-                --vfs-cache-mode=full \
-                --vfs-cache-max-size=10G \
-                --cache-dir=/tmp/rclone-cache \
-                --vfs-read-chunk-size=32M \
-                --vfs-read-chunk-size-limit=off \
-                --buffer-size=64M \
-                --dir-cache-time=12h \
-                --read-only \
-                --uid=1000 \
-                --gid=1000
-          lifecycle:
-            preStop:
-              exec:
-                command: ["fusermount", "-uz", "/media"]
-          securityContext:
-            privileged: true
-            runAsUser: 0
-            capabilities:
-              add: ["SYS_ADMIN"]
+              while true; do
+                rclone sync "gdrive:media" /media --config=/config/rclone/rclone.conf --transfers=4 --checkers=8
+                sleep 300
+              done
           resources:
             limits:
               cpu: 300m
@@ -98,12 +78,9 @@ spec:
           volumeMounts:
             - mountPath: /media
               name: media-public
-              mountPropagation: Bidirectional
             - mountPath: /config/rclone
               name: rclone-config
               readOnly: true
-            - mountPath: /dev/fuse
-              name: dev-fuse
       dnsConfig:
         nameservers:
           - 1.1.1.1
@@ -121,7 +98,3 @@ spec:
         - name: rclone-config
           secret:
             secretName: rclone-config
-        - name: dev-fuse
-          hostPath:
-            path: /dev/fuse
-            type: CharDevice
