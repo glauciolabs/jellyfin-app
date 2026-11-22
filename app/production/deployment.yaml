@@ -63,7 +63,7 @@ spec:
           image: rclone/rclone:latest
           args:
             - mount
-            - gdrive:
+            - "gdrive:"
             - /media
             - --config=/config/rclone/rclone.conf
             - --allow-other
