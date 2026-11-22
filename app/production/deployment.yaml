@@ -30,7 +30,7 @@ spec:
                       - h89-2
       containers:
         - name: jellyfin
-          image: linuxserver/jellyfin:arm64v8-version-12.4ubu2604
+          image: linuxserver/jellyfin@sha256:82c8c6785fece0ce9470e5541f3d0b68afd104f1857c91c3f55c369843394658
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
@@ -67,10 +67,24 @@ spec:
             - /media
             - --config=/config/rclone/rclone.conf
             - --allow-other
-            - --vfs-cache-mode=minimal
+            - --vfs-cache-mode=full
+            - --vfs-cache-max-size=10G
+            - --vfs-read-chunk-size=32M
+            - --vfs-read-chunk-size-limit=off
+            - --buffer-size=64M
+            - --dir-cache-time=12h
             - --read-only
             - --uid=1000
             - --gid=1000
+          lifecycle:
+            preStop:
+              exec:
+                command: ["fusermount", "-uz", "/media"]
+          livenessProbe:
+            exec:
+              command: ["ls", "/media"]
+            initialDelaySeconds: 15
+            periodSeconds: 30
           securityContext:
             privileged: true
           resources:
@@ -100,7 +114,9 @@ spec:
             path: /data/jellyfin-app/config
             type: DirectoryOrCreate
         - name: media-public
-          emptyDir: {}
+          hostPath:
+            path: /data/jellyfin-app/gdrive
+            type: DirectoryOrCreate
         - name: rclone-config
           secret:
             secretName: rclone-config
