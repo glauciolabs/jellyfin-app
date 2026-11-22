@@ -70,6 +70,7 @@ spec:
             - --allow-non-empty
             - --vfs-cache-mode=full
             - --vfs-cache-max-size=10G
+            - --cache-dir=/tmp/rclone-cache
             - --vfs-read-chunk-size=32M
             - --vfs-read-chunk-size-limit=off
             - --buffer-size=64M
@@ -81,11 +82,6 @@ spec:
             preStop:
               exec:
                 command: ["fusermount", "-uz", "/media"]
-          livenessProbe:
-            exec:
-              command: ["ls", "/media"]
-            initialDelaySeconds: 15
-            periodSeconds: 30
           securityContext:
             privileged: true
           resources:
