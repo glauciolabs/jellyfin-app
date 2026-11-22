@@ -65,13 +65,13 @@ spec:
           args:
             - |
               while true; do
-                rclone sync "gdrive:media" /media --config=/config/rclone/rclone.conf --transfers=4 --checkers=8
+                rclone sync "gdrive:media" /media --config=/config/rclone/rclone.conf --transfers=2 --checkers=4 --buffer-size=16M
                 sleep 300
               done
           resources:
             limits:
               cpu: 300m
-              memory: 256Mi
+              memory: 512Mi
             requests:
               cpu: 50m
               memory: 64Mi
