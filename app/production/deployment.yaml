@@ -67,6 +67,7 @@ spec:
             - /media
             - --config=/config/rclone/rclone.conf
             - --allow-other
+            - --allow-non-empty
             - --vfs-cache-mode=full
             - --vfs-cache-max-size=10G
             - --vfs-read-chunk-size=32M
