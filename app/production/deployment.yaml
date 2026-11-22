@@ -111,9 +111,7 @@ spec:
             path: /data/jellyfin-app/config
             type: DirectoryOrCreate
         - name: media-public
-          hostPath:
-            path: /data/jellyfin-app/gdrive
-            type: DirectoryOrCreate
+          emptyDir: {}
         - name: rclone-config
           secret:
             secretName: rclone-config
