@@ -59,6 +59,34 @@ spec:
               name: media-public
               mountPropagation: HostToContainer
               readOnly: true
+        - name: rclone
+          image: rclone/rclone:latest
+          args:
+            - mount
+            - gdrive:
+            - /media
+            - --config=/config/rclone/rclone.conf
+            - --allow-other
+            - --vfs-cache-mode=minimal
+            - --read-only
+            - --uid=1000
+            - --gid=1000
+          securityContext:
+            privileged: true
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          volumeMounts:
+            - mountPath: /media
+              name: media-public
+              mountPropagation: Bidirectional
+            - mountPath: /config/rclone
+              name: rclone-config
+              readOnly: true
       dnsConfig:
         nameservers:
           - 1.1.1.1
@@ -72,6 +100,7 @@ spec:
             path: /data/jellyfin-app/config
             type: DirectoryOrCreate
         - name: media-public
-          hostPath:
-            path: /onedrive-glaucio-media-root
-            type: DirectoryOrCreate
+          emptyDir: {}
+        - name: rclone-config
+          secret:
+            secretName: rclone-config
