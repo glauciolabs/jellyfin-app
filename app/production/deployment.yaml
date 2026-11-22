@@ -98,6 +98,8 @@ spec:
             - mountPath: /config/rclone
               name: rclone-config
               readOnly: true
+            - mountPath: /dev/fuse
+              name: dev-fuse
       dnsConfig:
         nameservers:
           - 1.1.1.1
@@ -115,3 +117,7 @@ spec:
         - name: rclone-config
           secret:
             secretName: rclone-config
+        - name: dev-fuse
+          hostPath:
+            path: /dev/fuse
+            type: CharDevice
